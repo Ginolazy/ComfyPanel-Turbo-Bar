@@ -38,6 +38,15 @@ Please **check “Remember my choice”** and allow the requested permission.
 
 This only needs to be confirmed during the initial setup.
 
+### macOS Developer Verification Warning
+
+If macOS says that “ComfyPanel Turbo Bar.app” cannot be opened because the developer cannot be verified,
+run this command in Terminal:
+
+```bash
+xattr -d com.apple.quarantine "/Applications/ComfyPanel Turbo Bar.app"
+```
+
 ## Requirements
 
 * **ComfyPanel 2.0 or later**
@@ -90,6 +99,14 @@ Turbo Mode
 请**勾选“记住我的选择”**，然后允许所请求的权限。
 
 完成首次设置后，通常无需再次确认。
+
+### macOS 开发者验证提示
+
+如果 macOS 提示“ComfyPanel Turbo Bar.app”无法打开，请在终端执行：
+
+```bash
+xattr -d com.apple.quarantine "/Applications/ComfyPanel Turbo Bar.app"
+```
 
 ## 系统要求
 
