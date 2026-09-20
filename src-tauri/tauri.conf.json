@@ -1,0 +1,65 @@
+{
+  "$schema": "https://schema.tauri.app/config/2",
+  "productName": "ComfyPanel Turbo Bar",
+  "version": "1.0.0",
+  "identifier": "com.comfypanel.turbo",
+  "build": {
+    "beforeBuildCommand": "npm run build:frontend",
+    "frontendDist": "../dist"
+  },
+  "app": {
+    "macOSPrivateApi": true,
+    "security": {
+      "capabilities": [
+        {
+          "identifier": "turbo-window",
+          "windows": [
+            "turbo"
+          ],
+          "permissions": [
+            "core:window:default",
+            "core:window:allow-start-dragging",
+            "core:window:allow-hide",
+            "core:window:allow-show",
+            "core:window:allow-set-size",
+            "core:window:allow-set-always-on-top",
+            "core:tray:default"
+          ]
+        }
+      ]
+    },
+    "windows": [
+      {
+        "label": "turbo",
+        "title": "ComfyPanel Turbo Bar",
+        "width": 440,
+        "height": 40,
+        "center": true,
+        "resizable": false,
+        "decorations": false,
+        "transparent": true,
+        "shadow": false,
+        "alwaysOnTop": true,
+        "skipTaskbar": true,
+        "visible": false
+      }
+    ]
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": [
+      "icons/icon.icns",
+      "icons/icon.ico"
+    ],
+    "macOS": {
+      "infoPlist": "Info.plist"
+    },
+    "windows": {
+      "nsis": {
+        "installMode": "perMachine",
+        "installerHooks": "nsis/hooks.nsh"
+      }
+    }
+  }
+}
