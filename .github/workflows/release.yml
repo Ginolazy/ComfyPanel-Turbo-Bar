@@ -1,0 +1,86 @@
+name: Release ComfyPanel Turbo Bar
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  release:
+    permissions:
+      contents: write
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin --bundles dmg'
+            tauriScript: 'bash scripts/build_macos_release.sh'
+          - platform: 'macos-15-intel'
+            args: '--target x86_64-apple-darwin --bundles dmg'
+            tauriScript: 'bash scripts/build_macos_release.sh'
+          - platform: 'windows-latest'
+            args: '--bundles nsis'
+            tauriScript: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v5
+
+      - name: Install Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: 'npm'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || (matrix.platform == 'macos-15-intel' && 'x86_64-apple-darwin' || '') }}
+
+      - name: Rust cache
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: './src-tauri -> target'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Prepare release notes
+        id: release_notes
+        shell: bash
+        run: |
+          python3 - <<'PYEOF'
+          import os
+          import re
+
+          version = os.environ["GITHUB_REF_NAME"].lstrip("v")
+          with open("CHANGELOG.md", "r", encoding="utf-8") as changelog_file:
+            changelog = changelog_file.read()
+          match = re.search(rf"(?m)^(?:##\s*)?\[?v?{re.escape(version)}\]?\s*(?:[-—].*)?$", changelog)
+          if match:
+            body = changelog[match.end():]
+            next_section = re.search(r"(?m)^##\s+", body)
+            notes = body[:next_section.start()].strip() if next_section else body.strip()
+          else:
+            notes = "Automatic release built by GitHub Actions."
+          with open(os.environ["GITHUB_OUTPUT"], "a", encoding="utf-8") as output_file:
+            output_file.write("body<<RELEASE_NOTES\n")
+            output_file.write(notes + "\n")
+            output_file.write("RELEASE_NOTES\n")
+          PYEOF
+
+      - name: Build Turbo Bar with Tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'ComfyPanel Turbo Bar ${{ github.ref_name }}'
+          releaseBody: ${{ steps.release_notes.outputs.body }}
+          releaseDraft: false
+          prerelease: false
+          tauriScript: ${{ matrix.tauriScript }}
+          args: ${{ matrix.args }}
