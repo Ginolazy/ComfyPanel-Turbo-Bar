@@ -240,12 +240,12 @@ function makeWidget(w) {
 
             let classes = [];
             if (w.variant) classes.push(w.variant);
-            if (w.icon) classes.push('icon-btn', `icon-${w.icon}`);
+            if (w.icon) classes.push('icon-btn');
             if (w.active) classes.push('active');
             if (classes.length) el.className = classes.join(' ');
 
-            if (w.icon === 'crop-selection') {
-                el.innerHTML = `<svg viewBox="0 0 56 56" class="btn-svg" width="14" height="14" fill="none" stroke="currentColor" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"><path stroke-dasharray="7 5" d="M12 5v38h38"/><path stroke-dasharray="7 5" d="M44 51V13H6"/><line x1="12" y1="0" x2="12" y2="5"/><line x1="51" y1="43" x2="56" y2="43"/><line x1="0" y1="13" x2="5" y2="13"/><line x1="44" y1="51" x2="44" y2="56"/></svg>`;
+            if (w.icon) {
+                el.innerHTML = w.icon;
             } else if (w.label) {
                 el.textContent = w.label;
             }
