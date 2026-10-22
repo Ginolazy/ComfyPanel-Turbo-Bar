@@ -400,24 +400,9 @@ window.addEventListener('blur', () => {
 
 // ── Receive ────────────────────────────────────────────────────────────────
 
-let _isShowing = false;
-
-async function showBar() {
-    if (_isShowing) return;
-    _isShowing = true;
-    try {
-        const win = getCurrentWindow();
-        await win.show();
-        // Re-assert alwaysOnTop: macOS may drop it after the window goes background
-        await win.setAlwaysOnTop(true);
-    } catch (e) { }
-    _isShowing = false;
-}
-
 function receive({ type, payload = {} }) {
     if (type === 'state') {
         if (payload.mode === 'turbo') {
-            showBar();
             if (Array.isArray(payload.widgets)) renderWidgets(payload.widgets);
         } else {
             getCurrentWindow().hide();

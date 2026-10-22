@@ -335,10 +335,9 @@ fn show_turbo_bar(win: &tauri::WebviewWindow) {
     use objc2::runtime::AnyObject;
     use raw_window_handle::{HasWindowHandle, RawWindowHandle};
 
-    let _ = win.show();
     let _ = win.set_always_on_top(true);
 
-    // orderFrontRegardless must run on the main thread.
+    // orderFrontRegardless must run on the main thread and shows window without stealing focus.
     if let Ok(handle) = win.window_handle() {
         if let RawWindowHandle::AppKit(h) = handle.as_raw() {
             let ns_win_ptr = unsafe {
@@ -513,10 +512,8 @@ fn apply_non_activating_macos(win: &tauri::WebviewWindow) {
                     let new_cls = objc_allocateClassPair(panel_class as *const AnyClass, b"TurboBarPanel\0".as_ptr() as *const _, 0);
                     if !new_cls.is_null() {
                         let sel_key = sel_registerName(b"canBecomeKeyWindow\0".as_ptr() as *const _);
-                        let sel_main = sel_registerName(b"canBecomeMainWindow\0".as_ptr() as *const _);
                         let types = b"c@:\0".as_ptr() as *const _;
                         class_addMethod(new_cls, sel_key, yes_getter, types);
-                        class_addMethod(new_cls, sel_main, yes_getter, types);
                         objc_registerClassPair(new_cls);
                     }
                 }

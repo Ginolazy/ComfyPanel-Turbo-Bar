@@ -15,10 +15,7 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin --bundles dmg'
-            tauriScript: 'bash scripts/build_macos_release.sh'
-          - platform: 'macos-15-intel'
-            args: '--target x86_64-apple-darwin --bundles dmg'
+            args: '--target universal-apple-darwin --bundles dmg'
             tauriScript: 'bash scripts/build_macos_release.sh'
           - platform: 'windows-latest'
             args: '--bundles nsis'
@@ -38,7 +35,7 @@ jobs:
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
         with:
-          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin' || (matrix.platform == 'macos-15-intel' && 'x86_64-apple-darwin' || '') }}
+          targets: ${{ matrix.platform == 'macos-latest' && 'aarch64-apple-darwin,x86_64-apple-darwin' || '' }}
 
       - name: Rust cache
         uses: swatinem/rust-cache@v2
