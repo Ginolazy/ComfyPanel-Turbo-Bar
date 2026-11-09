@@ -41,6 +41,20 @@ struct ProxyErrorResponse {
     msg: String,
 }
 
+fn is_allowed_proxy_host(url_str: &str) -> bool {
+    let Ok(parsed) = reqwest::Url::parse(url_str) else {
+        return false;
+    };
+    let Some(host) = parsed.host_str() else {
+        return false;
+    };
+    let host = host.to_lowercase();
+    host == "runninghub.cn"
+        || host.ends_with(".runninghub.cn")
+        || host == "runninghub.ai"
+        || host.ends_with(".runninghub.ai")
+}
+
 async fn handle_proxy_request(client: &reqwest::Client, body_bytes: &[u8]) -> (u16, String, String) {
     let payload: ProxyPayload = match serde_json::from_slice(body_bytes) {
         Ok(p) => p,
@@ -64,6 +78,16 @@ async fn handle_proxy_request(client: &reqwest::Client, body_bytes: &[u8]) -> (u
         })
         .unwrap_or_default();
         return (400, "application/json".into(), err_json);
+    }
+
+    if !is_allowed_proxy_host(&base_url) {
+        let err_json = serde_json::to_string(&ProxyErrorResponse {
+            success: false,
+            code: 403,
+            msg: "Access denied: proxy target host not in allowlist".into(),
+        })
+        .unwrap_or_default();
+        return (403, "application/json".into(), err_json);
     }
 
     let mut endpoint = payload.endpoint.unwrap_or_default();

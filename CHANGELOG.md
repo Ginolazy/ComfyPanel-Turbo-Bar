@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.1.1] — 2026-11-09
+
+• Security Hardening: Added strict target verification for the local proxy service, ensuring network requests are safely restricted to official service endpoints.
+
+• 安全加固与优化：加固本地后台代理服务，增加官方目标安全校验，防止异常代理请求，提升整体运行安全性。
+
 ## [2.1.0] — 2026-10-22
 
 • Enhanced Non-intrusive Canvas Experience: Fixed an issue where Photoshop shortcuts could become unresponsive in Turbo Mode, ensuring seamless shortcut usage while the bar is hovering.
